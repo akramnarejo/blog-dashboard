@@ -1,95 +1,115 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import { useGetPostsQuery } from "../lib/api";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Grid2 as Grid,
+  CircularProgress,
+  Box,
+} from "@mui/material";
+import Link from "next/link";
+import { useState } from "react";
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const { data: posts, isLoading, isError } = useGetPostsQuery();
+  const [currentPage, setCurrentPage] = useState(1);
+  if (isLoading) return <CircularProgress />;
+  if (isError) return <Typography>Error loading posts.</Typography>;
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  const totalPages: number = posts ? Math.floor(posts?.length / 10) : 0;
+
+  function handlePagination(paginate: string) {
+    if (paginate === "next") {
+      if (currentPage < totalPages) {
+        setCurrentPage(currentPage + 1);
+      }
+    } else if (paginate === "prev") {
+      if (currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    }
+  }
+  return (
+    <Box component={'div'}>
+      <Box
+        component={"div"}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <Typography variant="h4" gutterBottom>
+          Blog Posts
+        </Typography>
+        <Link href="/posts/create">
+          <Button variant="contained" color="primary" sx={{ mb: 2 }}>
+            Add New Post
+          </Button>
+        </Link>
+      </Box>
+      <Grid container spacing={2} columns={{ xs: 12, md: 6 }}>
+        {posts
+          ?.slice(currentPage * 10 - 10, currentPage * 10)
+          .sort((a, b) => b.id - a.id)
+          ?.map((post) => (
+            <Grid key={post.id} size={{ xs: 12, md: 3 }}>
+              <Card
+                sx={{
+                  height: '150px',
+                  backgroundColor: "#f1f1f1",
+                  boxShadow: "none",
+                }}
+              >
+                <CardContent>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    sx={{ textTransform: "capitalize" }}
+                  >
+                    {post.title}
+                  </Typography>
+                  <Typography variant="body1" noWrap>
+                    {post.body}
+                  </Typography>
+                  <Link href={`/posts/${post.id}`} passHref>
+                    <Button size="small" sx={{ mt: 1 }}>
+                      Read More
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+      </Grid>
+      <Box
+        component={"div"}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          mt: 4,
+        }}
+      >
+        <Button
+          onClick={() => handlePagination("prev")}
+          disabled={currentPage === 1}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          Prev
+        </Button>
+        <Typography sx={{ mx: 2 }}>
+          {currentPage}/{totalPages}
+        </Typography>
+        <Button
+          onClick={() => handlePagination("next")}
+          disabled={currentPage === totalPages}
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          Next
+        </Button>
+      </Box>
+    </Box>
   );
 }
