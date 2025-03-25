@@ -20,7 +20,7 @@ export default function AddPostPage() {
     e.preventDefault()
     try {
       await createPost({ title, body }).unwrap()
-      router.push('/')
+      router.push('/posts')
     } catch (error) {
       console.error('Error creating post:', error)
     }

@@ -24,7 +24,7 @@ export default function PostDetailPage() {
       <Typography variant="body1" sx={{ mt: 2 }}>
         {post.body + " " + post.body + " " + post.body}
       </Typography>
-      <Button variant="contained" size='small' sx={{marginTop: 4}}><Link href="/" >Back</Link></Button>
+      <Button variant="contained" size='small' sx={{marginTop: 4}}><Link href="/posts" >Back</Link></Button>
     </div>
   )
 }
