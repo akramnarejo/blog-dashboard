@@ -30,7 +30,7 @@ This is a simple blog dashboard built with **Next.js (App Router)**, **TypeScrip
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/blog-dashboard.git
+git clone https://github.com/akramnarejo/blog-dashboard.git
 ```
 
 ### 2. Go to project directory
